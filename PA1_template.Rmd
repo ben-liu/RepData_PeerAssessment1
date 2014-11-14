@@ -7,19 +7,143 @@ output:
 
 
 ## Loading and preprocessing the data
+```{r,echo=TRUE}
+# setwd("~/Google Drive/GitHub/RepData_PeerAssessment1")
+# setwd("C:/Users/Ben/Google Drive/GitHub/RepData_PeerAssessment1")
+# setwd("C:/Users/Harry Samsung Laptop/Downloads/ben.liu's work/GitHub/RepData_PeerAssessment1")
 
+unzip("activity.zip")
+# list.files()
+data=read.csv("activity.csv",colClass=c("integer","Date","factor"))
 
+library(ggplot2)
+library(lattice)
+
+```
 
 ## What is mean total number of steps taken per day?
+### histogram of the total number of steps taken each day
+```{r,echo=TRUE}
+# remove NA in steps column
+df=data[!is.na(data$steps),]
 
+dailysum=aggregate(steps~date,data=df,sum)
+qplot(steps, data=dailysum,main = "Histogram of total number of steps taken each day")
+```
 
+### the mean total number of steps taken per day
+```{r,echo=TRUE}
+dailymean=aggregate(steps~date,data=df,mean)
+dailymean
+```
+
+### the median total number of steps taken per day
+```{r,echo=TRUE}
+dailymedian=aggregate(steps~date,data=df,median)
+dailymedian
+```
 
 ## What is the average daily activity pattern?
+### time series plot of the 5-minute interval averaged across all days
+```{r,echo=TRUE}
+# allocate order number for intervals; 17568/288=61
+# data$int=rep(1:288,61)
+data$interval=as.numeric(as.character(data$interval))
 
+# aggregate steps with same interval/time of the day; NA will be removed
+fivemin=aggregate(steps~interval,data=data,mean,na.rm=TRUE)
+
+# total number of steps taken each day
+ggplot(fivemin,aes(x=interval,y=steps))+ geom_line() + ggtitle("time series plot of the 5-minute interval averaged across all days") + labs(x="5-min interval",y="Average steps") 
+
+```
+
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+The 5-minute interval containing the maximum number of steps is:
+```{r,echo=TRUE}
+fivemin$interval[fivemin$steps %in% max(fivemin$steps)]
+```
 
 
 ## Imputing missing values
+### Calculate and report the total number of missing values in the dataset
+Total number of missing values is:
+```{r,echo=TRUE}
+nrow(data[is.na(data$steps),])
+```
+
+### Devise a strategy for filling in all of the missing values in the dataset
+Use average (mean) 5-minute interval to fill in missing values.
+
+### Create a new dataset with the missing data filled in
+```{r,echo=TRUE}
+df1=data[!is.na(data$steps),]
+df2=data[is.na(data$steps),]
+for(i in 1:nrow(df2)){
+  df2$steps[i]=fivemin$steps[fivemin$interval %in% df2$interval[i]]
+}
+
+# create new dataset
+newdata=rbind(df1,df2)
+
+# rm(df1,df2)
+
+```
+
+### Make a histogram of the total number of steps taken each day
+```{r,echo=TRUE}
+dailysumnew=aggregate(steps~date,data=newdata,sum)
+qplot(steps, data=dailysumnew,main = "Histogram of total number of steps taken each day")
+```
+
+### Calculate and report the mean and median total number of steps taken per day. 
+
+#### new mean total number of steps taken per day
+```{r,echo=TRUE}
+dailymeannew=aggregate(steps~date,data=newdata,mean)
+dailymeannew
+```
+
+#### new median total number of steps taken per day
+```{r,echo=TRUE}
+dailymediannew=aggregate(steps~date,data=newdata,median)
+dailymediannew
+```
+### Compare with estimates from first part of assignment
+
++ Difference in mean of total number of steps taken per day:
+```{r,echo=TRUE}
+mean(dailymean$steps)-mean(dailymeannew$steps)
+```
+
++ Difference in median of total number of steps taken per day:
+```{r,echo=TRUE}
+mean(dailymedian$steps)-mean(dailymediannew$steps)
+```
+
+### Impact of imputing missing data on the estimates of the total daily number of steps
+On average, the mean of daily total steps doesn't change, while the median increases. 
 
 
+## Differences in activity patterns between weekdays and weekends
 
-## Are there differences in activity patterns between weekdays and weekends?
+### Create a new factor variable in the dataset with two levels - "weekday" and "weekend"
+
+```{r,echo=TRUE}
+# drop weekdays() function 
+library(timeDate)
+newdata$day[isWeekday(newdata$date,w=1:5)]="weekday"
+newdata$day[!isWeekday(newdata$date,w=1:5)]="weekend"
+
+```
+
+
+### Make a panel plot containing a time series plot of the 5-minute interval and the average number of steps taken across all weekday days or weekend days
+
+```{r,echo=TRUE}
+dailymeanwk=aggregate(steps~day+interval,data=newdata,mean)
+
+# library(lattice)
+with(dailymeanwk,xyplot(steps~interval|day,type="l",layout=c(1,2),xlab="5-minute interval",ylab="Average steps"))
+
+```
