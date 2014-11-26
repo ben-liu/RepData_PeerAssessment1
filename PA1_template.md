@@ -31,7 +31,7 @@ qplot(steps, data=dailysum,main = "Histogram of total number of steps taken each
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
 ### the mean total number of steps taken per day
 
@@ -176,7 +176,7 @@ fivemin=aggregate(steps~interval,data=data,mean,na.rm=TRUE)
 ggplot(fivemin,aes(x=interval,y=steps))+ geom_line() + ggtitle("time series plot of the 5-minute interval averaged across all days") + labs(x="5-min interval",y="Average steps") 
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 ### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 The 5-minute interval containing the maximum number of steps is:
@@ -231,7 +231,7 @@ qplot(steps, data=dailysumnew,main = "Histogram of total number of steps taken e
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 ### Calculate and report the mean and median total number of steps taken per day. 
 
@@ -412,6 +412,13 @@ On average, the mean of daily total steps doesn't change, while the median incre
 ```r
 # drop weekdays() function 
 library(timeDate)
+```
+
+```
+## Warning: package 'timeDate' was built under R version 3.1.2
+```
+
+```r
 newdata$day[isWeekday(newdata$date,w=1:5)]="weekday"
 newdata$day[!isWeekday(newdata$date,w=1:5)]="weekend"
 ```
@@ -427,4 +434,4 @@ dailymeanwk=aggregate(steps~day+interval,data=newdata,mean)
 with(dailymeanwk,xyplot(steps~interval|day,type="l",layout=c(1,2),xlab="5-minute interval",ylab="Average steps"))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
