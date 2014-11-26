@@ -179,7 +179,8 @@ ggplot(fivemin,aes(x=interval,y=steps))+ geom_line() + ggtitle("time series plot
 ![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 ### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-The 5-minute interval containing the maximum number of steps is:
+The 5-minute interval containing the maximum number of steps is **835**, with maximum steps of **206.1698113**.
+
 
 ```r
 fivemin$interval[fivemin$steps %in% max(fivemin$steps)]
@@ -189,10 +190,18 @@ fivemin$interval[fivemin$steps %in% max(fivemin$steps)]
 ## [1] 835
 ```
 
+```r
+fivemin$steps[fivemin$steps %in% max(fivemin$steps)]
+```
+
+```
+## [1] 206.1698
+```
 
 ## Imputing missing values
 ### Calculate and report the total number of missing values in the dataset
-Total number of missing values is:
+Total number of missing values is **2304**
+
 
 ```r
 nrow(data[is.na(data$steps),])
@@ -380,7 +389,9 @@ dailymediannew
 ```
 ### Compare with estimates from first part of assignment
 
-+ Difference in mean of total number of steps taken per day:
++ Difference in mean of total number of steps taken per day is **0**
++ Difference in median of total number of steps taken per day is **-4.4738633**
+
 
 ```r
 mean(dailymean$steps)-mean(dailymeannew$steps)
@@ -389,8 +400,6 @@ mean(dailymean$steps)-mean(dailymeannew$steps)
 ```
 ## [1] 0
 ```
-
-+ Difference in median of total number of steps taken per day:
 
 ```r
 mean(dailymedian$steps)-mean(dailymediannew$steps)
@@ -434,4 +443,6 @@ dailymeanwk=aggregate(steps~day+interval,data=newdata,mean)
 with(dailymeanwk,xyplot(steps~interval|day,type="l",layout=c(1,2),xlab="5-minute interval",ylab="Average steps"))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+
+During weekday mornings, a significant increase of activities can be observed.
